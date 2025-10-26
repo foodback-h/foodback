@@ -1,77 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Morselix – Kerala Hotel Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: #f5f8fa; }
-    header { background: #472dc2; color: white; text-align: center; padding: 24px 0; font-size: 2rem; letter-spacing: 2px; font-weight: 700;}
+    header { background: #472dc2; color: white; text-align: center; padding: 24px 0; font-size: 2rem; letter-spacing: 2px; font-weight: 700; }
     #controls {
       display: flex; flex-wrap: wrap; gap: 12px;
       justify-content: center; align-items: center;
       background: #e5e5ff; padding: 15px 0 10px 0;
-      border-bottom: 1px solid #dbd8fc; box-shadow:0 2px 12px rgba(71,45,194,0.03);
+      border-bottom: 1px solid #dbd8fc; box-shadow: 0 2px 12px rgba(71,45,194,0.03);
     }
     #searchInput, #category, #district, #sortBy {
       padding: 10px; border-radius: 6px; border: 1px solid #bbb; font-size: 1rem; background: #fff;
       transition: border 0.2s;
     }
-    #sortBy { min-width: 110px;}
-    #map { height: 55vh; width: 100%; border-bottom:2px solid #efefef;}
+    #sortBy { min-width: 110px; }
+    #map { height: 55vh; width: 100%; border-bottom: 2px solid #efefef; }
     #results {
       max-width: 950px; margin: 30px auto; background: white; padding: 18px;
       border-radius: 12px; box-shadow: 0 2px 12px rgba(71,45,194,0.07);
     }
-    #results h3 { color: #472dc2; font-weight: 700;letter-spacing:1px;}
-    .hotel-list-empty {color:#888; background:#fff8f8; padding:24px; border-radius:8px;}
+    #results h3 { color: #472dc2; font-weight: 700; letter-spacing: 1px; }
+    .hotel-list-empty {color: #888; background: #fff8f8; padding: 24px; border-radius: 8px;}
     .hotel-item {
-      display:flex; align-items:flex-start; gap:18px;
+      display: flex; align-items: flex-start; gap: 18px;
       border-left: 5px solid #472dc2; padding: 14px 18px; margin: 18px 0;
       background: #f8f7fc; border-radius: 10px; box-shadow: 0 2px 8px rgba(71,45,194,0.03);
       transition: box-shadow 0.2s, transform 0.2s;
-      min-height:90px;
+      min-height: 90px;
     }
-    .hotel-item:hover {box-shadow:0 6px 24px rgba(71,45,194,0.09); transform: translateY(-2px);}
+    .hotel-item:hover { box-shadow: 0 6px 24px rgba(71,45,194,0.09); transform: translateY(-2px); }
     .hotel-img {
-      width:66px; height:66px; object-fit:cover; border-radius:9px; background: #e0e0e0; border:1.5px solid #e5e5e5;
-      box-shadow:0 2px 6px rgba(71,45,194,0.04);}
-    .hotel-title { font-size: 1.18rem; font-weight: bold; color: #472dc2; margin-bottom:4px;}
-    .hotel-details { margin-top:4px; font-size: 0.97rem; color:#424242;}
-    .hotel-rating {color: #FF9800; font-weight:600;}
+      width: 66px; height: 66px; object-fit: cover; border-radius: 9px; background: #e0e0e0; border: 1.5px solid #e5e5e5;
+      box-shadow: 0 2px 6px rgba(71,45,194,0.04);
+    }
+    .hotel-title { font-size: 1.18rem; font-weight: bold; color: #472dc2; margin-bottom: 4px; }
+    .hotel-details { margin-top: 4px; font-size: 0.97rem; color: #424242; }
+    .hotel-rating { color: #FF9800; font-weight: 600; }
+
+    .feedback-section {
+      margin-top: 14px;
+      font-size: 0.93rem;
+      color: #333;
+    }
+    .feedback-item {
+      border-top: 1px solid #ddd;
+      padding: 8px 0;
+      display: flex;
+      gap: 12px;
+    }
+    .feedback-img {
+      max-width: 60px;
+      max-height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+    }
+    .feedback-text {
+      flex: 1;
+    }
+
     #addHotelBtn {
       background: #472dc2; color: white; border: none; border-radius: 6px;
       padding: 10px 20px; font-size: 1.06rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
-      box-shadow:0 1px 4px rgba(71,45,194,0.08);}
-    #addHotelBtn:hover {background: #32209e;}
-    #addHotelModal {
-      display:none; position: fixed; top:0; left:0; width:100vw; height:100vh;
-      background:rgba(90,91,178,0.13); z-index:20; justify-content:center; align-items:center;}
-    #addHotelForm {
-      background:white; padding:22px 28px; border-radius:12px; box-shadow:0 4px 25px rgba(71,45,194,0.1);
-      max-width:355px; width:90%;
+      box-shadow: 0 1px 4px rgba(71,45,194,0.08);
     }
-    #addHotelForm input, #addHotelForm select {margin-bottom: 12px; width:100%; font-size:1.01rem; padding:8px;}
+    #addHotelBtn:hover { background: #32209e; }
+
+    #addHotelModal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(90,91,178,0.13); z-index: 20; justify-content: center; align-items: center;
+    }
+    #addHotelForm {
+      background: white; padding: 22px 28px; border-radius: 12px; box-shadow: 0 4px 25px rgba(71,45,194,0.1);
+      max-width: 400px; width: 90%;
+    }
+    #addHotelForm input, #addHotelForm select, #addHotelForm textarea { margin-bottom: 12px; width: 100%; font-size: 1rem; padding: 8px; }
+    #addHotelForm textarea { resize: vertical; }
     #closeModal {
-      position:absolute; top:48px; right:16px; cursor:pointer; background:#ffeaea; border-radius:5px;
-      font-weight: bold; color:#d12a2a; border:none;padding:2px 8px;}
-    .map-pick-btn {display:block; background:#472dc2;color:#fff;padding:7px 16px;border-radius:7px;border:none;cursor:pointer;font-weight:600;}
-    .map-pick-btn:hover {background:#32209e;}
-    .picked-loc-label {font-size:1rem;color:#472dc2;margin-top:0;margin-bottom:0;}
-    @media(max-width:700px) {
-      #results {padding:6px;}
-      .hotel-item {flex-direction:column;align-items:stretch;}
-      .hotel-img {margin-bottom:8px;}
+      position: absolute; top: 48px; right: 16px; cursor: pointer; background: #ffeaea; border-radius: 5px;
+      font-weight: bold; color: #d12a2a; border: none; padding: 2px 8px;
+    }
+    .map-pick-btn { display: block; background: #472dc2; color: #fff; padding: 7px 16px; border-radius: 7px; border: none; cursor: pointer; font-weight: 600; }
+    .map-pick-btn:hover { background: #32209e; }
+    .picked-loc-label { font-size: 1rem; color: #472dc2; margin-top: 0; margin-bottom: 0; }
+    @media(max-width: 700px) {
+      #results { padding: 6px; }
+      .hotel-item { flex-direction: column; align-items: stretch; }
+      .hotel-img { margin-bottom: 8px; }
     }
   </style>
 </head>
 <body>
   <header>🍽️ Morselix – Kerala Hotel Finder</header>
-  
+
   <div id="controls">
-    <input type="text" id="searchInput" placeholder="Search hotels or district...">
+    <input type="text" id="searchInput" placeholder="Search hotels or district..." />
     <select id="category">
       <option value="">All Categories</option>
       <option value="luxury">Luxury</option>
@@ -100,8 +129,8 @@
     <form id="addHotelForm" autocomplete="off">
       <button id="closeModal" type="button" title="Close">&times;</button>
       <h4>Add a New Hotel</h4>
-      <input type="text" id="hotelName" placeholder="Hotel Name" required>
-      <input type="text" id="hotelAddress" placeholder="Address" required>
+      <input type="text" id="hotelName" placeholder="Hotel Name" required />
+      <input type="text" id="hotelAddress" placeholder="Address" required />
       <select id="hotelCategory" required>
         <option value="">Category</option>
         <option value="luxury">Luxury</option>
@@ -117,10 +146,31 @@
         <option>Kozhikode</option>
         <option>Wayanad</option>
       </select>
-      <input type="number" id="hotelRating" step="0.1" min="1" max="5" placeholder="Rating (1-5)" required>
+      <input type="number" id="hotelRating" step="0.1" min="1" max="5" placeholder="Rating (1-5)" required />
       <label class="picked-loc-label" id="pickedLocLabel">No location picked yet.</label>
-      <button class="map-pick-btn" type="button" id="pickLocationBtn">Pick location on map</button>
-      <button type="submit" id="submitHotel" style="background:#472dc2;color:white;font-weight:600;font-size:1.07rem;border:none;padding:8px 18px;border-radius:7px;cursor:pointer;margin-top:6px;">Save Hotel</button>
+
+      <label>Add Image URL (optional)</label>
+      <input type="url" id="hotelImageUrl" placeholder="Image URL" />
+      <label>Or upload image (optional)</label>
+      <input type="file" id="hotelImageFile" accept="image/*" />
+
+      <label>Feedback/Comments (optional)</label>
+      <textarea id="hotelFeedback" placeholder="Write your feedback here..." rows="3"></textarea>
+
+      <button
+        class="map-pick-btn"
+        type="button"
+        id="pickLocationBtn"
+      >
+        Pick location on map
+      </button>
+      <button
+        type="submit"
+        id="submitHotel"
+        style="background: #472dc2; color: white; font-weight: 600; font-size: 1.07rem; border: none; padding: 8px 18px; border-radius: 7px; cursor: pointer; margin-top: 6px;"
+      >
+        Save Hotel
+      </button>
     </form>
   </div>
 
@@ -132,55 +182,268 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Sample Kerala hotels with images
+    // Sample Kerala hotels 
     let hotels = [
-      {name: "Taj Malabar Resort & Spa", category: "luxury", address: "Willingdon Island, Kochi", district: "Ernakulam", coords: [9.9631, 76.2425], rating: 4.8, img:"https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=200&q=80"},
-      {name: "Le Meridien Kochi", category: "luxury", address: "Maradu, Kochi", district: "Ernakulam", coords: [9.9406, 76.3185], rating: 4.7, img:"https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=facearea&w=200&q=80"},
-      {name: "KTDC Mascot Hotel", category: "family", address: "Cantonment House", district: "Thiruvananthapuram", coords: [8.5075, 76.9558], rating: 4.4, img:"https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=facearea&w=200&q=80"},
-      {name: "The Raviz Kovalam", category: "luxury", address: "Kovalam Beach Road", district: "Thiruvananthapuram", coords: [8.4020, 76.9784], rating: 4.8, img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=facearea&w=200&q=80"},
-      {name: "Alleppey Palace", category: "family", address: "Backwaters", district: "Alappuzha", coords: [9.4981, 76.3388], rating: 4.5, img:"https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=facearea&w=200&q=80"},
-      {name: "Munnar Tea Valley Resort", category: "family", address: "Munnar", district: "Idukki", coords: [10.0868, 77.0570], rating: 4.6, img:"https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=200&q=80"},
-      {name: "Zostel Kochi", category: "budget", address: "Princess St, Fort Kochi", district: "Ernakulam", coords: [9.9667, 76.2420], rating: 4.2, img:"https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=facearea&w=200&q=80"},
-      {name: "Gateway Hotel Calicut", category: "luxury", address: "PT Usha Road", district: "Kozhikode", coords: [11.2561, 75.7760], rating: 4.5, img:"https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=facearea&w=200&q=80"},
-      {name: "Green Haven Homestay", category: "budget", address: "Wayanad", district: "Wayanad", coords: [11.6850, 76.1320], rating: 4.3, img:"https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=facearea&w=200&q=80"}
+      {
+        name: "Taj Malabar Resort & Spa",
+        category: "luxury",
+        address: "Willingdon Island, Kochi",
+        district: "Ernakulam",
+        coords: [9.9631, 76.2425],
+        rating: 4.8,
+        img:
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "Le Meridien Kochi",
+        category: "luxury",
+        address: "Maradu, Kochi",
+        district: "Ernakulam",
+        coords: [9.9406, 76.3185],
+        rating: 4.7,
+        img:
+          "https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "KTDC Mascot Hotel",
+        category: "family",
+        address: "Cantonment House",
+        district: "Thiruvananthapuram",
+        coords: [8.5075, 76.9558],
+        rating: 4.4,
+        img:
+          "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "The Raviz Kovalam",
+        category: "luxury",
+        address: "Kovalam Beach Road",
+        district: "Thiruvananthapuram",
+        coords: [8.402, 76.9784],
+        rating: 4.8,
+        img:
+          "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "Alleppey Palace",
+        category: "family",
+        address: "Backwaters",
+        district: "Alappuzha",
+        coords: [9.4981, 76.3388],
+        rating: 4.5,
+        img:
+          "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "Munnar Tea Valley Resort",
+        category: "family",
+        address: "Munnar",
+        district: "Idukki",
+        coords: [10.0868, 77.057],
+        rating: 4.6,
+        img:
+          "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "Zostel Kochi",
+        category: "budget",
+        address: "Princess St, Fort Kochi",
+        district: "Ernakulam",
+        coords: [9.9667, 76.242],
+        rating: 4.2,
+        img:
+          "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "Gateway Hotel Calicut",
+        category: "luxury",
+        address: "PT Usha Road",
+        district: "Kozhikode",
+        coords: [11.2561, 75.776],
+        rating: 4.5,
+        img:
+          "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
+      {
+        name: "Green Haven Homestay",
+        category: "budget",
+        address: "Wayanad",
+        district: "Wayanad",
+        coords: [11.685, 76.132],
+        rating: 4.3,
+        img:
+          "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=facearea&w=200&q=80",
+        feedbacks: [],
+      },
     ];
 
-    var map = L.map('map').setView([10.1632, 76.6413], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18, attribution: '© OpenStreetMap'
+    var map = L.map("map").setView([10.1632, 76.6413], 7);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "© OpenStreetMap",
     }).addTo(map);
 
     let markers = [];
+
     function showHotels(list) {
-      markers.forEach(marker => map.removeLayer(marker));
+      markers.forEach((marker) => map.removeLayer(marker));
       markers = [];
       const hotelListElem = document.getElementById("hotelList");
       hotelListElem.innerHTML = "";
 
-      if(list.length === 0){
-        hotelListElem.innerHTML='<div class="hotel-list-empty">No hotels match your filters or search. Try another term or reset filters!</div>';
+      if (list.length === 0) {
+        hotelListElem.innerHTML =
+          '<div class="hotel-list-empty">No hotels match your filters or search. Try another term or reset filters!</div>';
         return;
       }
 
-      list.forEach(hotel => {
-        const marker = L.marker(hotel.coords).addTo(map)
-          .bindPopup(`<b>${hotel.name}</b><br>${hotel.address}<br>District: ${hotel.district}<br>⭐ ${hotel.rating}`);
+      list.forEach((hotel, index) => {
+        const marker = L.marker(hotel.coords)
+          .addTo(map)
+          .bindPopup(
+            `<b>${hotel.name}</b><br>${hotel.address}<br>District: ${hotel.district}<br>⭐ ${hotel.rating}<br>
+            <strong>Feedbacks:</strong><br>
+            ${
+              hotel.feedbacks.length === 0
+                ? "No feedback yet."
+                : hotel.feedbacks
+                    .map(
+                      (fb) =>
+                        `<div style="margin-top:4px;">
+                         ${fb.text || ""}
+                         ${
+                           fb.img
+                             ? `<br><img src="${fb.img}" alt="Feedback image" style="max-width:100px; margin-top:4px;">`
+                             : ""
+                         }
+                         </div>`
+                    )
+                    .join("")
+            }
+            <br>
+            <button onclick="openFeedbackForm(${index})" style="margin-top:6px; padding:6px 10px; font-size:0.85rem; cursor:pointer;">Add Feedback</button>`
+          );
         markers.push(marker);
 
         hotelListElem.innerHTML += `
           <div class="hotel-item">
-            <img src="${hotel.img || 'https://placehold.co/60x60?text=M'}" alt="hotel image" class="hotel-img"/>
+            <img
+              src="${hotel.img || "https://placehold.co/60x60?text=M"}"
+              alt="hotel image"
+              class="hotel-img"
+            />
             <div style="flex:1">
               <div class="hotel-title">${hotel.name}</div>
               <div class="hotel-details">
-                <span>${hotel.category.replace(/^./, x => x.toUpperCase())}</span> | <span>${hotel.district}</span><br>
-                Address: ${hotel.address}<br>
+                <span>${hotel.category.replace(/^./, (x) => x.toUpperCase())}</span> | <span>${hotel.district}</span><br />
+                Address: ${hotel.address}<br />
                 Rating: <span class="hotel-rating">${hotel.rating} ⭐</span>
               </div>
+              <div class="feedback-section">
+                <strong>Feedbacks:</strong>
+                ${
+                  hotel.feedbacks.length === 0
+                    ? "<div>No feedback yet.</div>"
+                    : hotel.feedbacks
+                        .map(
+                          (fb) =>
+                            `<div class="feedback-item">
+                          ${
+                            fb.img
+                              ? `<img src="${fb.img}" alt="Feedback image" class="feedback-img" />`
+                              : ""
+                          }
+                          <div class="feedback-text">${fb.text || ""}</div>
+                        </div>`
+                        )
+                        .join("")
+                }
+                <button onclick="openFeedbackForm(${index})" style="margin-top:6px; padding:6px 10px; font-size:0.85rem; cursor:pointer;">Add Feedback</button>
+              </div>
             </div>
-          </div>`;
+          </div>
+        `;
       });
     }
+
+    // Feedback modal and functionality
+    const feedbackModalHTML = `
+      <div id="feedbackModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:30; align-items:center; justify-content:center;">
+        <form id="feedbackForm" style="background:#fff; padding:20px; border-radius:12px; max-width:400px; width:90%;">
+          <button id="closeFeedbackModal" type="button" style="float:right; font-size:1.3rem; line-height:1; border:none; background:none; cursor:pointer;">&times;</button>
+          <h4>Add Feedback</h4>
+          <textarea id="feedbackText" placeholder="Write your feedback here..." rows="4" maxlength="300" required style="width:100%; margin-bottom:12px; font-size:1rem;"></textarea>
+          <label>Add Image URL (optional)</label>
+          <input type="url" id="feedbackImageUrl" placeholder="Image URL" style="width:100%; margin-bottom:12px; font-size:1rem;" />
+          <input type="file" id="feedbackImageFile" accept="image/*" />
+          <button type="submit" style="background:#472dc2; color:#fff; padding:10px 18px; border:none; border-radius:8px; font-weight:600; cursor:pointer;">Submit Feedback</button>
+        </form>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', feedbackModalHTML);
+
+    const feedbackModal = document.getElementById('feedbackModal');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackText = document.getElementById('feedbackText');
+    const feedbackImageUrl = document.getElementById('feedbackImageUrl');
+    const feedbackImageFile = document.getElementById('feedbackImageFile');
+    const closeFeedbackModal = document.getElementById('closeFeedbackModal');
+
+    let currentHotelFeedbackIndex = null;
+
+    function openFeedbackForm(index) {
+      currentHotelFeedbackIndex = index;
+      feedbackText.value = '';
+      feedbackImageUrl.value = '';
+      feedbackImageFile.value = '';
+      feedbackModal.style.display = 'flex';
+    }
+
+    closeFeedbackModal.onclick = () => {
+      feedbackModal.style.display = 'none';
+    };
+
+    feedbackForm.onsubmit = function(e) {
+      e.preventDefault();
+
+      if(currentHotelFeedbackIndex === null) return;
+
+      const fbText = feedbackText.value.trim();
+      const fbImgUrl = feedbackImageUrl.value.trim();
+
+      if(!fbText && feedbackImageFile.files.length === 0 && !fbImgUrl) {
+        alert('Please add feedback text or image.');
+        return;
+      }
+
+      function addFeedback(imgData) {
+        hotels[currentHotelFeedbackIndex].feedbacks.push({text: fbText, img: imgData || fbImgUrl || null});
+        filterAndSortHotels();
+        feedbackModal.style.display = 'none';
+      }
+
+      if(feedbackImageFile.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          addFeedback(event.target.result);
+        };
+        reader.readAsDataURL(feedbackImageFile.files[0]);
+      } else {
+        addFeedback(null);
+      }
+
+    };
+
+    // Keeping your original filter and sort logic
     function filterAndSortHotels() {
       const keyword = document.getElementById('searchInput').value.toLowerCase();
       const cat = document.getElementById('category').value;
@@ -195,9 +458,9 @@
           hotel.district.toLowerCase().includes(keyword)
         )
       );
-      if(sortBy === 'nameAsc') filtered.sort((a,b)=>a.name.localeCompare(b.name));
-      if(sortBy === 'ratingDesc') filtered.sort((a,b)=>b.rating-a.rating);
-      if(sortBy === 'ratingAsc') filtered.sort((a,b)=>a.rating-b.rating);
+      if(sortBy === 'nameAsc') filtered.sort((a,b) => a.name.localeCompare(b.name));
+      if(sortBy === 'ratingDesc') filtered.sort((a,b) => b.rating - a.rating);
+      if(sortBy === 'ratingAsc') filtered.sort((a,b) => a.rating - b.rating);
       showHotels(filtered);
     }
 
@@ -205,36 +468,27 @@
     document.getElementById('category').addEventListener('change', filterAndSortHotels);
     document.getElementById('district').addEventListener('change', filterAndSortHotels);
     document.getElementById('sortBy').addEventListener('change', filterAndSortHotels);
+    document.getElementById('addHotelBtn').addEventListener('click', () => {
+      document.getElementById('addHotelModal').style.display = 'flex';
+    });
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('addHotelModal').style.display = 'none';
+    });
 
-    // Add Hotel Modal with improved map picker
+    // Pick location logic on map for Add Hotel modal
     let addHotelPickedCoords = null;
     let addHotelMarker = null;
 
-    document.getElementById('addHotelBtn').onclick = function () {
-      document.getElementById('hotelName').value = "";
-      document.getElementById('hotelAddress').value = "";
-      document.getElementById('hotelCategory').value = "";
-      document.getElementById('hotelDistrict').value = "";
-      document.getElementById('hotelRating').value = "";
-      document.getElementById('pickedLocLabel').innerText = "No location picked yet.";
-      addHotelPickedCoords = null;
-      if(addHotelMarker) { map.removeLayer(addHotelMarker); addHotelMarker = null; }
-      document.getElementById('addHotelModal').style.display = 'flex';
-    };
-    document.getElementById('closeModal').onclick = function () {
-      document.getElementById('addHotelModal').style.display = 'none';
-      if(addHotelMarker) { map.removeLayer(addHotelMarker); addHotelMarker = null; }
-    };
     document.getElementById('pickLocationBtn').onclick = function () {
       document.getElementById('addHotelModal').style.display = "none";
-      document.body.style.cursor="crosshair";
+      document.body.style.cursor = "crosshair";
       map.once('click', function(e) {
-        document.body.style.cursor="";
+        document.body.style.cursor = "";
         addHotelPickedCoords = [e.latlng.lat, e.latlng.lng];
         if(addHotelMarker) map.removeLayer(addHotelMarker);
         addHotelMarker = L.marker(addHotelPickedCoords, {opacity:0.85}).addTo(map);
         document.getElementById('pickedLocLabel').innerText = `Location picked ✔ (${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)})`;
-        setTimeout(()=>{document.getElementById('addHotelModal').style.display = 'flex';},200);
+        setTimeout(()=>{document.getElementById('addHotelModal').style.display = 'flex';}, 200);
       });
     };
 
@@ -246,19 +500,50 @@
       }
       const name = document.getElementById('hotelName').value;
       const address = document.getElementById('hotelAddress').value;
-      const coords = addHotelPickedCoords;
       const category = document.getElementById('hotelCategory').value;
       const district = document.getElementById('hotelDistrict').value;
       const rating = parseFloat(document.getElementById('hotelRating').value);
-      hotels.push({ name, address, coords, category, district, rating, img:'https://placehold.co/66x66?text=M' });
+      const imageUrl = document.getElementById('hotelImageUrl').value.trim();
+      const imageFileInput = document.getElementById('hotelImageFile');
+
+      function addHotelWithImage(img) {
+        let newHotel = {
+          name,
+          address,
+          coords: addHotelPickedCoords,
+          category,
+          district,
+          rating,
+          img: img || imageUrl || 'https://placehold.co/66x66?text=M',
+          feedbacks: []
+        };
+        hotels.push(newHotel);
+        addHotelPickedCoords = null;
+        filterAndSortHotels();
+        map.setView(newHotel.coords, 10);
+        resetAddHotelModal();
+      }
+
+      if (imageFileInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          addHotelWithImage(event.target.result);
+        };
+        reader.readAsDataURL(imageFileInput.files[0]);
+      } else {
+        addHotelWithImage(null);
+      }
+    };
+
+    function resetAddHotelModal() {
       document.getElementById('addHotelForm').reset();
-      addHotelPickedCoords = null;
       document.getElementById('pickedLocLabel').innerText = "No location picked yet.";
       document.getElementById('addHotelModal').style.display = 'none';
-      if(addHotelMarker) { map.removeLayer(addHotelMarker); addHotelMarker = null; }
-      filterAndSortHotels();
-      map.setView(coords, 10);
-    };
+      if(addHotelMarker) {
+        map.removeLayer(addHotelMarker);
+        addHotelMarker = null;
+      }
+    }
 
     showHotels(hotels);
   </script>
